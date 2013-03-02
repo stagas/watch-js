@@ -23,6 +23,7 @@ program
   .usage('[options] <file>')
   .option('-i, --interval <s>', 'Run on an interval of seconds.', parseInt)
   .option('-b, --before <cmd>', 'Command to run before monitoring starts.')
+  .option('-l, --live', 'Live reload.', Boolean)
   .option('-w, --watch <dir>', 'Watch for changes on dir.')
   .parse(process.argv)
 
@@ -38,7 +39,41 @@ if (!cmd[0]) program.help()
 
 start()
 
-function start () {
+if (program.live) {
+  var http = require('http')
+  var express = require('express')
+  var app = express()
+
+  app.all('*', function (req, res) {
+    var body = ''
+    body += 'var WS = window.MozWebSocket || window.WebSocket;\n'
+    body += 'var ws = new WS("ws://localhost:3003/refresh");\n'
+    body += 'ws.onmessage = function (msg) {\n'
+    body += '  console.log(msg);'
+    body += '  if ("refresh"==msg.data) window.location.reload();\n'
+    body += '};\n'
+    res.setHeader('Content-Type', 'text/javascript')
+    res.send(body)
+  })
+
+  var server = http.createServer(app)
+  server.listen(3003, function () {
+    console.log('-> live reload server listening on port %s', server.address().port)
+  })
+
+  var WebSocketServer = require('ws').Server
+  var wss = new WebSocketServer({ server: server })
+  var clients = []
+
+  wss.on('connection', function (ws) {
+    clients.push(ws)
+    ws.on('close', function () {
+      clients.splice(clients.indexOf(ws), 1)
+    })
+  })
+}
+
+function start (fn) {
   if (starting) return
   starting = true
 
@@ -48,12 +83,25 @@ function start () {
     var b = program.before.split(' ')
     exec(b[0], b.slice(1), function () {
       var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
+        start(refresh)
         child.kill()
       }))
+      fn && setTimeout(fn, 1000)
     })
   }
   else {
-    exec(cmd[0], cmd.slice(1), monitor(start))
+    exec(cmd[0], cmd.slice(1), monitor(function () {
+      fn && fn()
+      start(refresh)
+    }))
+  }
+}
+
+function refresh () {
+  if (program.live) {
+    clients.forEach(function (ws) {
+      ws.send('refresh')
+    })
   }
 }
 
