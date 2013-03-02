@@ -31,7 +31,7 @@ When a file changes it will kill the server and restart.
 
   Add this to your html:
 
-  - `<script src="http://localhost:3030/refresh.js"></script>`
+  - `<script src="http://localhost:3003/refresh.js"></script>`
 
   and then:
 
@@ -47,8 +47,7 @@ on changes:
 
   - `watch --running node server`
 
-- Watch a long-running process, like a server, restart
-on changes and update browser:
+- Same as above but also update browser:
 
   - `watch --live --running node server`
 
