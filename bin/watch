@@ -23,6 +23,7 @@ program
   .usage('[options] <file>')
   .option('-i, --interval <s>', 'Run on an interval of seconds.', parseInt)
   .option('-b, --before <cmd>', 'Command to run before monitoring starts.')
+  .option('-r, --running', 'Monitor long-running process.', Boolean)
   .option('-l, --live', 'Live reload.', Boolean)
   .option('-w, --watch <dir>', 'Watch for changes on dir.')
   .parse(process.argv)
@@ -90,10 +91,19 @@ function start (fn) {
     })
   }
   else {
-    exec(cmd[0], cmd.slice(1), monitor(function () {
-      fn && fn()
-      start(refresh)
-    }))
+    if (program.running) {
+      var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
+        child.kill()
+      }))
+      child.on('exit', function () { start(refresh) })
+      fn && setTimeout(fn, 1000)
+    }
+    else {
+      exec(cmd[0], cmd.slice(1), monitor(function () {
+        fn && fn()
+        start(refresh)
+      }))
+    }
   }
 }
 
