@@ -34,6 +34,8 @@ var dir = program.watch || cwd
 
 var cmd = program.args
 
+if (!cmd[0]) program.help()
+
 start()
 
 function start () {
