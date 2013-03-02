@@ -17,8 +17,9 @@ var cp = require('child_process')
  * Command line.
  */
 
+var pkg = require(__dirname+'/../package.json')
 program
-  .version('0.0.1')
+  .version(pkg.version)
   .usage('[options] <file>')
   .option('-i, --interval <s>', 'Run on an interval of seconds.', parseInt)
   .option('-b, --before <cmd>', 'Command to run before monitoring starts.')
