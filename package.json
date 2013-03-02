@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "watch",
   "author": "stagas",
-  "licence": "MIT",
+  "license": "MIT",
   "bin": {
     "watch": "bin/watch"
   },

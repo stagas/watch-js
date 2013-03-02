@@ -3,6 +3,6 @@
 
 
 
-## Licence
+## License
 
 MIT
