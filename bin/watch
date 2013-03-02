@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+
+/*!
+ * watch-js
+ */
+
+/**
+ * Module dependencies.
+ */
+
+var fs = require('fs')
+var path = require('path')
+var exec = require('child_process').execFile
+var program = require('commander')
+
+/**
+ * Command line.
+ */
+
+program
+  .version('0.0.1')
+  .usage('[options] <file>')
+  .option('-i, --interval <s>', 'Run on an interval of seconds.', parseInt)
+  .option('-w, --watch <dir>', 'Watch for changes on dir.')
+  .parse(process.argv)
+
+var watching = {}
+var starting = false
+
+var cwd = process.cwd()
+var dir = program.watch || cwd
+
+var cmd = program.args
+run(cmd[0], cmd.slice(1))
+
+function run (cmd, args) {
+  if (watching[dir]) {
+    watching[dir].forEach(function (w) {
+      w.close()
+    })
+    watching[dir] = null
+  }
+  starting = true
+  run = run.bind(this, cmd, args)
+  console.log('-> executing :', cmd, args)
+  var stdio = [0,1,2]
+  var child = exec(cmd, args, { stdio: stdio }, function () {
+    starting = false
+    if (program.interval) {
+      setTimeout(run, program.interval*1000)
+    }
+    else {
+      watch(dir, run)
+    }
+  })
+  child.stderr.pipe(process.stderr)
+  child.stdout.pipe(process.stdout)
+}
+
+function watch (dir, fn) {
+  var fnTimeout
+  if (watching[dir]) {
+  console.log(' *** already watching : %s ***', dir)
+    return
+  }
+  console.log('  traversing : %s', dir)
+  watching[dir] = readdirtree(dir)
+  watching[dir].unshift(dir)
+  watching[dir] = watching[dir].map(function (d) {
+  console.log('    watching : %s', d)
+    return fs.watch(d, function (ev, filename) {
+      if (starting) return
+      if ('change' == ev && '.' != filename.substr(0,1)) {
+        clearTimeout(fnTimeout)
+        console.log(' *** changed : %s', path.join(d, filename))
+        fnTimeout = setTimeout(run, program.delay||1500)
+      }
+    })
+  })
+}
+
+/**
+ * Read a dir tree.
+ *
+ * @param {string} dirname
+ * @return {array} dirs
+ */
+
+function readdirtree (dirname, arr) {
+  arr = arr || []
+
+  fs.readdirSync(dirname)
+    .filter(function (file) { return '.' != file.substr(0,1) })
+    .map(function (file) { return path.join(dirname, file) })
+    .forEach(function (file) {
+      if (fs.statSync(file).isDirectory()) {
+        arr.push(file)
+        readdirtree(file, arr)
+      }
+    })
+
+  return arr
+}
