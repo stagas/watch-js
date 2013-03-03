@@ -1,0 +1,7 @@
+{
+  "name": "live-reload",
+  "repo": "stagas/watch-js",
+  "version": "0.0.1",
+  "main": "lib/reload.js",
+  "scripts": ["lib/reload.js"]
+}
