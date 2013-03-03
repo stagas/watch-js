@@ -12,6 +12,7 @@ var fs = require('fs')
 var path = require('path')
 var program = require('commander')
 var readdirtree = require('readdirtree')
+var minimatch = require('minimatch')
 var cp = require('child_process')
 
 /**
@@ -22,6 +23,7 @@ var pkg = require(__dirname+'/../package.json')
 program
   .version(pkg.version)
   .usage('[options] <file>')
+  .option('-m, --match <glob>', 'Only report changes when filename matches glob.')
   .option('-i, --interval <s>', 'Run on an interval of seconds.', parseInt)
   .option('-b, --before <cmd>', 'Command to run before monitoring starts.')
   .option('-r, --running', 'Monitor long-running process.', Boolean)
@@ -169,7 +171,8 @@ function watch (dir, fn) {
   console.log('    watching : %s', d)
     return fs.watch(d, function (ev, filename) {
       if (starting) return
-      if ('change' == ev && '.' != filename.substr(0,1)) {
+      if ('change' == ev && '.' != filename[0]
+      && (program.match ? minimatch(filename, program.match) : true)) {
         clearTimeout(fnTimeout)
         console.log(' *** changed : %s', path.join(d, filename))
         fnTimeout = setTimeout(fn, program.delay||1500)
