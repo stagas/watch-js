@@ -11,6 +11,7 @@
 var fs = require('fs')
 var path = require('path')
 var program = require('commander')
+var readdirtree = require('readdirtree')
 var cp = require('child_process')
 
 /**
@@ -159,8 +160,10 @@ function watch (dir, fn) {
   console.log(' *** already watching : %s ***', dir)
     return
   }
-  console.log('  traversing : %s', dir)
-  watching[dir] = readdirtree(dir)
+  console.log('-> watching all under : %s', dir)
+  watching[dir] = readdirtree(dir, function (d) {
+    return '.' != d[0]
+  })
   watching[dir].unshift(dir)
   watching[dir] = watching[dir].map(function (d) {
   console.log('    watching : %s', d)
@@ -182,27 +185,4 @@ function unwatch () {
     })
     watching[dir] = null
   }
-}
-
-/**
- * Read a dir tree.
- *
- * @param {string} dirname
- * @return {array} dirs
- */
-
-function readdirtree (dirname, arr) {
-  arr = arr || []
-
-  fs.readdirSync(dirname)
-    .filter(function (file) { return '.' != file.substr(0,1) })
-    .map(function (file) { return path.join(dirname, file) })
-    .forEach(function (file) {
-      if (fs.statSync(file).isDirectory()) {
-        arr.push(file)
-        readdirtree(file, arr)
-      }
-    })
-
-  return arr
 }
