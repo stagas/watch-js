@@ -50,15 +50,7 @@ if (program.live) {
   var app = express()
 
   app.all('*', function (req, res) {
-    var body = ''
-    body += 'var WS = window.MozWebSocket || window.WebSocket;\n'
-    body += 'var ws = new WS("ws://localhost:3003/refresh");\n'
-    body += 'ws.onmessage = function (msg) {\n'
-    body += '  console.log(msg);'
-    body += '  if ("refresh"==msg.data) window.location.reload();\n'
-    body += '};\n'
-    res.setHeader('Content-Type', 'text/javascript')
-    res.send(body)
+    res.sendfile(path.normalize(__dirname+'/../lib/refresh.js'))
   })
 
   var server = http.createServer(app)
