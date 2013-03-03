@@ -71,8 +71,10 @@ if (program.live) {
   var clients = []
 
   wss.on('connection', function (ws) {
+    console.log('connected live reload client')
     clients.push(ws)
     ws.on('close', function () {
+      console.log('disconnected live reload client')
       clients.splice(clients.indexOf(ws), 1)
     })
   })
@@ -163,7 +165,7 @@ function watch (dir, fn) {
     console.log(' *** already watching : %s ***', dir)
     return
   }
-  console.log('-> watching all under : %s', dir)
+  console.log('-> watching %s under : %s', program.match || 'all', dir)
   watching[dir] = readdirtree(dir, function (d) {
     return '.' != d[0]
   })
