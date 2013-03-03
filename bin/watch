@@ -27,6 +27,7 @@ program
   .option('-i, --interval <s>', 'Run on an interval of seconds.', parseInt)
   .option('-b, --before <cmd>', 'Command to run before monitoring starts.')
   .option('-r, --running', 'Monitor long-running process.', Boolean)
+  .option('-v, --verbose', 'Be verbose.', Boolean)
   .option('-l, --live', 'Live reload.', Boolean)
   .option('-w, --watch <dir>', 'Watch for changes on dir.')
   .parse(process.argv)
@@ -159,7 +160,7 @@ function spawn (cmd, args, fn) {
 function watch (dir, fn) {
   var fnTimeout
   if (watching[dir]) {
-  console.log(' *** already watching : %s ***', dir)
+    console.log(' *** already watching : %s ***', dir)
     return
   }
   console.log('-> watching all under : %s', dir)
@@ -168,7 +169,7 @@ function watch (dir, fn) {
   })
   watching[dir].unshift(dir)
   watching[dir] = watching[dir].map(function (d) {
-  console.log('    watching : %s', d)
+    program.verbose && console.log('    watching : %s', d)
     return fs.watch(d, function (ev, filename) {
       if (starting) return
       if ('change' == ev && '.' != filename[0]
