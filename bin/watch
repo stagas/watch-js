@@ -50,7 +50,7 @@ if (program.live) {
   var app = express()
 
   app.all('*', function (req, res) {
-    res.sendfile(path.normalize(__dirname+'/../lib/refresh.js'))
+    res.sendfile(path.normalize(__dirname+'/../lib/reload.js'))
   })
 
   var server = http.createServer(app)
@@ -84,7 +84,7 @@ function start (fn) {
       var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
         child.kill()
       }))
-      child.on('exit', function () { start(refresh) })
+      child.on('exit', function () { start(reload) })
       fn && setTimeout(fn, 1000)
     })
   }
@@ -93,22 +93,22 @@ function start (fn) {
       var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
         child.kill()
       }))
-      child.on('exit', function () { start(refresh) })
+      child.on('exit', function () { start(reload) })
       fn && setTimeout(fn, 1000)
     }
     else {
       exec(cmd[0], cmd.slice(1), monitor(function () {
         fn && fn()
-        start(refresh)
+        start(reload)
       }))
     }
   }
 }
 
-function refresh () {
+function reload () {
   if (program.live) {
     clients.forEach(function (ws) {
-      ws.send('refresh')
+      ws.send('reload')
     })
   }
 }
