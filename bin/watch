@@ -29,6 +29,7 @@ program
   .option('-r, --running', 'Monitor long-running process.', Boolean)
   .option('-v, --verbose', 'Be verbose.', Boolean)
   .option('-l, --live', 'Live reload.', Boolean)
+  .option('-d, --delay <ms>', 'Time in ms to delay updates.', parseInt)
   .option('-w, --watch <dir>', 'Watch for changes on dir.')
   .parse(process.argv)
 
@@ -94,7 +95,7 @@ function start (fn) {
         child.kill()
       }))
       child.on('exit', function () { start(reload) })
-      fn && setTimeout(fn, 1000)
+      fn && setTimeout(fn, program.delay || 1000)
     }
     else {
       exec(cmd[0], cmd.slice(1), monitor(function () {
