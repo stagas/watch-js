@@ -81,15 +81,11 @@ function start (fn) {
 
   if (program.before) {
     var b = program.before.split(' ')
-    exec(b[0], b.slice(1), function () {
-      var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
-        child.kill()
-      }))
-      child.on('exit', function () { start(reload) })
-      fn && setTimeout(fn, 1000)
-    })
+    exec(b[0], b.slice(1), run)
   }
-  else {
+  else run()
+
+  function run () {
     if (program.running) {
       var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
         child.kill()
