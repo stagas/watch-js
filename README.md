@@ -8,9 +8,11 @@
 
     -h, --help          output usage information
     -V, --version       output the version number
+    -m, --match <glob>  Only report changes when filename matches glob.
     -i, --interval <s>  Run on an interval of seconds.
     -b, --before <cmd>  Command to run before monitoring starts.
     -r, --running       Monitor long-running process.
+    -v, --verbose       Be verbose.
     -l, --live          Live reload.
     -w, --watch <dir>   Watch for changes on dir.
 ```
@@ -21,6 +23,11 @@
 under current dir.
 
   - `watch make`
+
+- Glob-style pattern matching for files to watch:
+
+  - `watch --match *.js make`
+  - `watch -m *.{js,json} make`
 
 - Runs `make`, then starts a server and monitors changes.
 When a file changes it will kill the server and restart.
