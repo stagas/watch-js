@@ -90,14 +90,10 @@ function start (fn) {
       var child = spawn(cmd[0], cmd.slice(1), monitor(function () {
         child.kill()
       }))
-      child.on('exit', function () { start(reload) })
-      fn && setTimeout(fn, program.delay || 1000)
+      child.on('exit', start)
     }
     else {
-      exec(cmd[0], cmd.slice(1), monitor(function () {
-        fn && fn()
-        start(reload)
-      }))
+      exec(cmd[0], cmd.slice(1), monitor(start))
     }
   }
 }
@@ -113,6 +109,8 @@ function reload () {
 function monitor (fn) {
   return function () {
     starting = false
+
+    setTimeout(reload, program.delay || 0)
 
     if (program.interval) {
       setTimeout(fn, program.interval*1000)
@@ -167,7 +165,7 @@ function watch (dir, fn) {
       && (program.match ? minimatch(filename, program.match) : true)) {
         clearTimeout(fnTimeout)
         console.log(' *** changed : %s', path.join(d, filename))
-        fnTimeout = setTimeout(fn, program.delay||1500)
+        fnTimeout = setTimeout(fn, 1000)
       }
     })
   })
