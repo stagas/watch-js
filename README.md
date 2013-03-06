@@ -20,44 +20,48 @@
 
 ## Examples
 
-- Runs `make` every time a file changes
-under current dir.
+Runs `make` when a file changes:
 
-  - `watch make`
+```sh
+$ watch make
+```
 
-- Glob-style pattern matching for files to watch:
+Runs `make` before monitoring __(-b)__, then runs `node server`, a long-running process __(-r)__:
 
-  - `watch --match *.js make`
-  - `watch -m *.{js,json} make`
+```sh
+$ watch -rb make node server
+```
 
-- Runs `make`, then starts a server and monitors changes.
-When a file changes it will kill the server and restart.
+Runs `make` then reloads __(-l)__ browser when files of type `.js` or `.css` change __(-m)__:
 
-  - `watch --before make node server.js`
+```sh
+$ watch -lm *.{js,css} make
+```
 
-- Monitors file changes, runs `make` and reloads browser:
+The above method requires this script tag:
 
-  Add this to your html:
+```html
+<script src="http://localhost:3003/reload.js"></script>
+```
 
-  - `<script src="http://localhost:3003/refresh.js"></script>`
+If you use [Components](https://github.com/component/component/wiki/Components)
+you can add it in like this:
 
-  and then:
+```js
+"development": {
+  "stagas/watch-js": "*"
+}
+```
 
-  - `watch --live make`
+Then you can do `require('stagas-watch-js')` in your development files.
 
-- Combined behavior, will run `make`, then a node server and
-restart everything and reload browser when a file changes:
+Now, in conjuction with `watch -l make`, when you save a file in your editor it will run `make` and reload your browser automatically.
 
-  - `watch --live --before make node server`
+Combinations possible:
 
-- Watch a long-running process, like a server and restart
-on changes:
-
-  - `watch --running node server`
-
-- Same as above but also update browser:
-
-  - `watch --live --running node server`
+```sh
+$ watch -lrb "make clean build" node server
+```
 
 ## License
 
