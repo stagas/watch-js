@@ -14,6 +14,7 @@
     -r, --running       Monitor long-running process.
     -v, --verbose       Be verbose.
     -l, --live          Live reload.
+    -d, --delay <ms>    Time in ms to delay updates.
     -w, --watch <dir>   Watch for changes on dir.
 ```
 
