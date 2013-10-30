@@ -153,10 +153,12 @@ function watch (dir, fn) {
     return
   }
   console.log('-> watching %s under : %s', program.match || 'all', dir)
-  watching[dir] = readdirtree(dir, function (d) {
-    return '.' != d[0]
-  })
-  watching[dir].unshift(dir)
+  watching[dir] = dir.split(',').reduce(function (p, n) {
+    return p.concat(readdirtree(n, function (d) {
+      return '.' != d[0]
+    }))
+  }, [])
+  watching[dir].unshift.apply(watching[dir], dir.split(','))
   watching[dir] = watching[dir].map(function (d) {
     program.verbose && console.log('    watching : %s', d)
     return fs.watch(d, function (ev, filename) {
