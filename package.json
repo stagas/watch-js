@@ -4,6 +4,7 @@
   "description": "watch",
   "author": "stagas",
   "license": "MIT",
+  "preferGlobal": true,
   "bin": {
     "watch": "bin/watch"
   },
