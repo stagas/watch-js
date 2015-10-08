@@ -55,7 +55,7 @@ you can add it in like this:
 
 Then you can do `require('stagas-watch-js')` in your development files.
 
-Now, in conjuction with `watch -l make`, when you save a file in your editor it will run `make` and reload your browser automatically.
+Now, in conjunction with `watch -l make`, when you save a file in your editor it will run `make` and reload your browser automatically.
 
 Combinations possible:
 
